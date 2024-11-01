@@ -1,0 +1,77 @@
+name: Test and Lint
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry self update
+      - run: poetry install --only main --no-interaction --no-ansi --without apache-beam;
+      - run: poetry check
+      - run: pip install tox
+      - run: tox
+
+      # Testing Docker container runs successfully
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.GCP_ARTIFACT_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.DOCKER_REGISTRY }}/dota2-cast-assist:latest .
+
+      - name: Create Service Account Key File
+        run: echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > service-account-key.json
+
+      - name: Run container to verify
+        run: |
+          docker run -d --name my-temp-container \
+            -e GOOGLE_APPLICATION_CREDENTIALS=/service/service-account-key.json \
+            -e GOOGLE_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }} \
+            -e GOOGLE_PROJECT_NUMBER=${{ secrets.GCP_PROJECT_NUMBER }} \
+            -e SERVICE_NAME=dota2-cast-assist-ci-cd-test \
+            -v ${{ github.workspace }}/service-account-key.json:/service/service-account-key.json \
+            ${{ secrets.GCP_ARTIFACT_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.DOCKER_REGISTRY }}/dota2-cast-assist:latest
+
+      - name: Clean up service account Key File
+        run: rm -f service-account-key.json
+
+      - name: Container Healthcheck
+        run: |
+          echo "Waiting for the initial start period (35 sec)..."
+          sleep 35
+          docker logs my-temp-container
+          for i in {1..5}; do
+            echo "Checking container health, attempt $i..."
+            status=$(docker inspect --format='{{json .State.Health.Status}}' my-temp-container)
+          
+            if [ "$status" == '"healthy"' ]; then
+              echo "Container is healthy."
+              break
+            elif [ "$status" == '"unhealthy"' ]; then
+              echo "Container failed to start."
+              exit 1
+            else
+              echo "Container is still starting, status=$status"
+            fi
+          
+            # Wait for 30s before the next check
+            sleep 30
+          done
+          
+          if [ "$status" != '"healthy"' ]; then
+            echo "Container did not become healthy after 5 attempts."
+            exit 1
+          fi
+
+      - name: Stop and remove container
+        run: |
+          docker stop my-temp-container
+          docker rm my-temp-container

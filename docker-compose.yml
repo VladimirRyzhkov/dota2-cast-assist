@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  dota2-cast-assist:
+    container_name: "dota2-cast-assist"
+    build:
+      context: .
+      args:
+        SERVICE_NAME: ${SERVICE_NAME}
+    volumes:
+      - ./google_cloud_service_account_key.json:/etc/secrets/key.json
+    ports:
+      - 8080:8080
+    env_file:
+      - .env
