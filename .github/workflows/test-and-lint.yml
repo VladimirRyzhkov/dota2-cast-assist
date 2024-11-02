@@ -20,12 +20,12 @@ jobs:
       - run: pip install tox
       - run: tox
 
-      # Testing Docker container runs successfully
+      # Testing Docker container builds and runs successfully
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.GCP_ARTIFACT_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.DOCKER_REGISTRY }}/dota2-cast-assist:latest .
+        run: docker build -t ${{ secrets.ARTIFACT_REGISTRY }}/dota2-cast-assist:latest .
 
       - name: Create Service Account Key File
         run: echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > service-account-key.json
@@ -37,8 +37,9 @@ jobs:
             -e GOOGLE_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }} \
             -e GOOGLE_PROJECT_NUMBER=${{ secrets.GCP_PROJECT_NUMBER }} \
             -e SERVICE_NAME=dota2-cast-assist-ci-cd-test \
+            -e GITHUB_ACTIONS_CI_CD=True \
             -v ${{ github.workspace }}/service-account-key.json:/service/service-account-key.json \
-            ${{ secrets.GCP_ARTIFACT_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.DOCKER_REGISTRY }}/dota2-cast-assist:latest
+            ${{ secrets.ARTIFACT_REGISTRY }}/dota2-cast-assist:latest
 
       - name: Clean up service account Key File
         run: rm -f service-account-key.json

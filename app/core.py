@@ -176,7 +176,7 @@ async def live_match_stat(token: str) -> Match:
 
     if timestamp > 0:
         utc = datetime.now(timezone.utc).timestamp()
-        # TODO check if timestamp is UTC
+        # TODO: check if timestamp is UTC
         match_data.event_age_seconds = int(utc) - timestamp
 
     clock_time = 0

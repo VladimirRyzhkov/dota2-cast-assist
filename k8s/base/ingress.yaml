@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dota2-cast-assist-ingress
+  labels:
+    app: dota2-cast-assist-app
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dota2-cast-assist-service
+                port:
+                  number: 8082
