@@ -342,6 +342,7 @@ def run(**kwargs):
                         ).with_input_types(str)
         )
 
+        # TODO: check if WindowInto uses message.timestamp correctly
         events_window = (
             events
             | "E: Window" >> beam.WindowInto(

@@ -1,0 +1,7 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: dota2-cast-assist-cert
+spec:
+  domains:
+    - dota2-cast-assist.scrapingmartians.com

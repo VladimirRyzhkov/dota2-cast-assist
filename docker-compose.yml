@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  dota2-cast-assist:
+  api:
     container_name: "dota2-cast-assist"
     build:
       context: .

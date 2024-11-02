@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dota2-cast-assist-ingress
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "34.45.161.200"
+    networking.gke.io/managed-certificates: dota2-cast-assist-cert
+spec:
+  rules:
+    - host: dota2-cast-assist.scrapingmartians.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dota2-cast-assist-service
+                port:
+                  number: 8082

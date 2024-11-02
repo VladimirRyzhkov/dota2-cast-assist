@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dota2-cast-assist-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: dota2-cast-assist
+          image: dota2-cast-assist-api:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: "/var/secrets/google/key.json"
+          volumeMounts:
+            - name: google-credentials
+              mountPath: /var/secrets/google
+              readOnly: true
+      volumes:
+        - name: google-credentials
+          secret:
+            secretName: google-application-credentials

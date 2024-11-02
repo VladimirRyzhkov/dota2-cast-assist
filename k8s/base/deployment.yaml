@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dota2-cast-assist-deployment
+  labels:
+    app: dota2-cast-assist-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dota2-cast-assist-app
+  template:
+    metadata:
+      labels:
+        app: dota2-cast-assist-app
+    spec:
+      containers:
+        - name: dota2-cast-assist
+          image: dota2-cast-assist-image-placeholder # TODO substitute it in GHA workflow for k8s/gke
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: dota2-cast-assist-env
+          resources:
+            requests:
+              cpu: "1"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1024Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 10
+            failureThreshold: 3
