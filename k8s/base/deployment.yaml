@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: dota2-cast-assist
-          image: dota2-cast-assist-image-placeholder # TODO substitute it in GHA workflow for k8s/gke
+          image: dota2-cast-assist-image-placeholder
           ports:
             - containerPort: 8080
           envFrom:
