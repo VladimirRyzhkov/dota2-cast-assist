@@ -16,7 +16,7 @@ TEAM_KEYS = {"team2": "radiant", "team3": "dire"}
 
 # TODO: check event_data.get("timestamp", 0) is UTC
 
-# see Player"s features here https://snyk.io/advisor/npm-package/dotagsi
+# See Player's the full list of features here https://snyk.io/advisor/npm-package/dotagsi
 FEATURES = [
     "activity",
     "assists",

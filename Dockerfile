@@ -16,7 +16,7 @@ ENV SERVICE_NAME=${SERVICE_NAME}
 # Copy your application code
 COPY app /app
 COPY common /common
-COPY events_processor/libs/firestore.py events_processor/libs/firestore.py
+COPY events_processor/libs/firestore.py /events_processor/libs/firestore.py
 COPY live_matches_crawler /live_matches_crawler
 COPY healthcheck /healthcheck
 COPY ./pyproject.toml /app/pyproject.toml
@@ -44,4 +44,4 @@ WORKDIR /app
 
 ENV PYTHONPATH="${PYTHONPATH}:/"
 
-CMD ["/app/start.sh"]
+CMD ["bash", "/app/start.sh"]

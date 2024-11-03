@@ -3,9 +3,9 @@ kind: Ingress
 metadata:
   name: dota2-cast-assist-ingress
   annotations:
-    kubernetes.io/ingress.class: "gce"
-    kubernetes.io/ingress.global-static-ip-name: "34.45.161.200"
-    networking.gke.io/managed-certificates: dota2-cast-assist-cert
+    kubernetes.io/ingress.class: gce # GKE creates an external HTTP(S) load balancer (deprecated but only working)
+    kubernetes.io/ingress.global-static-ip-name: dota2-cast-assist-static-ip
+    networking.gke.io/pre-shared-cert: dota2-cast-assist-cert
 spec:
   rules:
     - host: dota2-cast-assist.scrapingmartians.com

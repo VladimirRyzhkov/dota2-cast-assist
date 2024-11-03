@@ -1,0 +1,8 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dota2-cast-assist-deployment
+spec:
+  template:
+    spec:
+      serviceAccountName: ksa-scrapingmartians-prod

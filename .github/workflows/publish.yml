@@ -25,7 +25,7 @@ jobs:
           password: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.ARTIFACT_REGISTRY }}/dota2-cast-assist:latest .
+        run: docker build --platform linux/amd64 -t ${{ secrets.ARTIFACT_REGISTRY }}/dota2-cast-assist:latest .
 
       - name: Push Docker image
         run: docker push ${{ secrets.ARTIFACT_REGISTRY }}/dota2-cast-assist:latest
