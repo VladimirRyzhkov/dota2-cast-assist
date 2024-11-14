@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dota2-cast-assist-service
+spec:
+  type: LoadBalancer
