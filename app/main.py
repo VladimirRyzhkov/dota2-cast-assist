@@ -12,7 +12,7 @@ settings = Settings()
 
 
 # Routes
-@app.get("/version")
+@app.get("/dota2-gsi/version")
 async def version() -> Dict[str, str]:
     res = jsonify(
         {
@@ -22,11 +22,11 @@ async def version() -> Dict[str, str]:
     )
     return res
 
-@app.get("/health")
+@app.get("/dota2-gsi/health")
 async def health_check() -> Dict[str, str]:
     return jsonify({"status": "healthy"})
 
-@app.post("/dota2-event")
+@app.post("/dota2-gsi/dota2-event")
 async def reg_dota2_event(request: Request) -> core.RegEventStatus:
     try:
         event_data = await request.json()
@@ -38,11 +38,17 @@ async def reg_dota2_event(request: Request) -> core.RegEventStatus:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail="An error occurred while processing the event")
 
-@app.get("/live-match/stats")
+@app.get("/dota2-gsi/live-match/stats")
 async def live_match_stats(
     token: str = Query(
         default="",
         description="Provide your personal spectator's token",
+        pattern="^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
     ),
 ) -> core.Match:
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Token is required and cannot be empty"
+        )
     return await core.live_match_stat(token)
