@@ -9,6 +9,7 @@ from common.settings import Settings
 
 app = FastAPI(
     docs_url="/dota2-gsi/docs",
+    openapi_url="/dota2-gsi/openapi.json",
     redoc_url=None
 )
 
