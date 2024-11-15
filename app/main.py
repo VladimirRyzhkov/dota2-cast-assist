@@ -7,7 +7,11 @@ from app import core
 from common.helpers import get_version_from_pyproject, jsonify
 from common.settings import Settings
 
-app = FastAPI()
+app = FastAPI(
+    docs_url="/dota2-gsi/docs",
+    redoc_url=None
+)
+
 settings = Settings()
 
 
