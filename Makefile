@@ -1,3 +1,9 @@
+# Load environment variables from .env
+ifneq ($(wildcard .env),)
+	include .env
+	export $(shell sed 's/=.*//' .env)
+endif
+
 up:
 	docker-compose -f docker-compose.yml up -d
 
@@ -29,14 +35,9 @@ rebuild:
 #	kubectl delete -k k8s/local
 #	kill -f "kubectl port-forward service/dota2-cast-assist-service 8080:8082" || true
 #
-#k8s-prod-spinup:
-#	ifneq (,$(wildcard .env))
-#		include .env
-#		export $(shell sed 's/=.*//' .env)
-#	endif
-#
-#	gcloud container clusters get-credentials $(KUBERNETES_CLUSTER) --zone $(KUBERNETES_CLUSTER_ZONE)
-#	kustomize build k8s/gke | envsubst | kubectl apply -f -
-#
-#k8s-prod-down:
-#	kubectl delete -k k8s/gke
+k8s-prod-spinup:
+	gcloud container clusters get-credentials $(KUBERNETES_CLUSTER) --zone $(KUBERNETES_CLUSTER_ZONE)
+	kustomize build k8s/gke | envsubst | kubectl apply -f -
+
+k8s-prod-down:
+	kubectl delete -k k8s/gke
