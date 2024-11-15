@@ -1,32 +1,11 @@
 import argparse
 import json
 import os
-from typing import Tuple
 
 import apache_beam as beam
 from apache_beam.options.pipeline_options import GoogleCloudOptions, PipelineOptions, StandardOptions, WorkerOptions
 from apache_beam.transforms import GroupByKey, window
 from libs.firestore import LiveMatches
-
-
-class DownloadLiveMatches(beam.DoFn):
-    """
-    A DoFn that downloads live matches from Steam
-    """
-    def __init__(self, project_id: str, collection_name: str, *args, **kwargs):
-        # At the moment Beam does not support calls of super() (BEAM-6158)
-        #super(DownloadLiveMatches, self).__init__(*args, **kwargs)
-        beam.DoFn.__init__(self, *args, **kwargs)
-
-        self.project_id = project_id
-        self.collection_name = collection_name
-
-    def process(self, _element, *args, **kwargs):
-        from common.steam_api import SteamAPIConnection
-
-        steam_api = SteamAPIConnection.get_instance()
-        live_matches = steam_api.get_live_matches()
-        yield live_matches
 
 
 class Parse(beam.DoFn):
@@ -37,7 +16,9 @@ class Parse(beam.DoFn):
     """
     def process(self, message: bytes, **kwargs):
         import json
+        from typing import Tuple
 
+        import apache_beam as beam
         import chardet
         from libs.firestore import GsiEvent
 
@@ -89,7 +70,25 @@ class Parse(beam.DoFn):
         player_data = event_data.get("player", {})
 
         if gsi_event.match_id > 0 and gsi_event.token and player_data.keys():
-            yield gsi_event.match_id, gsi_event
+            # Return results in the compatible format for windowing
+            yield beam.window.TimestampedValue(gsi_event.model_dump_json(), gsi_event.timestamp)
+
+
+class MatchIDSplit(beam.DoFn):
+    """
+    DoFn that splits events on key-value pairs, using match_id as the key
+    """
+    def process(self, gsi_event_json: str, **kwargs):
+        from libs.firestore import GsiEvent
+        from pydantic_core import ValidationError
+
+        try:
+            gsi_event = GsiEvent.model_validate_json(gsi_event_json)
+        except ValidationError:
+            gsi_event = None
+
+        if gsi_event:
+            yield gsi_event.match_id, gsi_event_json
 
 
 class EnrichWrite(beam.DoFn):
@@ -122,6 +121,7 @@ class EnrichWrite(beam.DoFn):
         **kwargs
     ):
         from libs.firestore import FirestoreDb, GsiEvent, LiveMatchInfo
+        from pydantic_core import ValidationError
 
         fs_client = FirestoreDb(
             project_id=self.project_id,
@@ -156,7 +156,15 @@ class EnrichWrite(beam.DoFn):
 
             gsi_event.match_data = json.dumps(gsi_match_dict)
 
-        match_id, gsi_events = match_events
+        match_id, gsi_event_dumps = match_events
+
+        try:
+            gsi_events = [
+                GsiEvent.model_validate_json(gsi_event_dump)
+                for gsi_event_dump in gsi_event_dumps
+            ]
+        except ValidationError:
+            gsi_events = []
 
         # One single token means one particular spectator
         all_tokens= set(e.token for e in gsi_events)
@@ -318,7 +326,7 @@ def run(**kwargs):
     )
 
     standard_options = options.view_as(StandardOptions)
-    standard_options.runner =  "DataflowRunner"
+    standard_options.runner = "DataflowRunner"
     standard_options.streaming = True
 
     google_cloud_options = options.view_as(GoogleCloudOptions)
@@ -337,30 +345,30 @@ def run(**kwargs):
     with beam.Pipeline(options=options) as p:
         events = (
             p
+            # Read unbound collection from the queue
             | "Read" >> beam.io.ReadFromPubSub(
                             subscription=pubsub_subscription_name
                         ).with_input_types(str)
+            # Extracting events from messages
+            | "Parse" >> beam.ParDo(Parse())
         )
 
-        # TODO: check if WindowInto uses message.timestamp correctly
+        # Combine messages into windows by timestamp
         events_window = (
             events
-            | "E: Window" >> beam.WindowInto(
+            | "Windowing" >> beam.WindowInto(
                                 window.FixedWindows(refresh_rate)
                              )
-        )
-
-        # Extracting events from messages
-        pure_events = (
-            events_window
-            | "E: Parse" >> beam.ParDo(Parse())
+            | 'Split match_id' >> beam.ParDo(MatchIDSplit())
         )
 
         # Enriching matches with team names and writing to DB
         (
-                pure_events
-                | "E: Aggregate" >> GroupByKey()
-                | "E: Enrich & Write" >> beam.ParDo(
+                events_window
+                # Group by match_id
+                | "Aggregate match_id" >> GroupByKey()
+                # Take the last one, enrich with live matches data
+                | "Enrich & Write" >> beam.ParDo(
                                             EnrichWrite(
                                                 project_id=project_id,
                                                 gsi_events_collection_name=collection_gsi_event,

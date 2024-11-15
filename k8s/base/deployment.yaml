@@ -31,7 +31,7 @@ spec:
               memory: "1024Mi"
           livenessProbe:
             httpGet:
-              path: /health
+              path: /dota2-gsi/health
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 60
@@ -39,7 +39,7 @@ spec:
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /health
+              path: /dota2-gsi/health
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 60

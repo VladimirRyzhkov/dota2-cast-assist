@@ -1,10 +1,12 @@
 resources:
-- ../base
+  - ../base
+  - backend-config.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 patches:
-- path: deployment-patch.yaml
-- path: ingress-patch.yaml
+  - path: deployment-patch.yaml
+  - path: service-patch.yaml
+  - path: ingress-patch.yaml
 images:
   - name: dota2-cast-assist-image-placeholder
     newName: ${DOTA2_CAST_ASSIST_IMAGE_NAME}

@@ -6,3 +6,12 @@ spec:
   template:
     spec:
       serviceAccountName: ksa-scrapingmartians-prod
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In
+                    values:
+                      - us-central1-c

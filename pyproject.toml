@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dota2-cast-assist"
-version = "0.1.0"
+version = "0.2.0"
 description = "Real-time assistant for broadcasters, integrating Dota 2’s live API and GSI to enhance commentary"
 authors = ["Vlad <dota2-cast-assist@scrapingmartians.com>"]
 license = "Apache-2.0"

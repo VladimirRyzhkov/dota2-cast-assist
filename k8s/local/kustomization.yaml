@@ -1,16 +1,16 @@
 resources:
-- ../base
+  - ../base
 secretGenerator:
-- files:
-  - key.json=google_cloud_service_account_key.json
-  name: google-application-credentials
-  type: Opaque
+  - files:
+    - key.json=google_cloud_service_account_key.json
+    name: google-application-credentials
+    type: Opaque
 configMapGenerator:
-- envs:
-  - .env
-  name: dota2-cast-assist-env
+  - envs:
+    - .env
+    name: dota2-cast-assist-env
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 patches:
-- path: deployment-patch.yaml
-- path: service-patch.yaml
+  - path: deployment-patch.yaml
+  - path: service-patch.yaml
