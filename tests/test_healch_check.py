@@ -20,7 +20,7 @@ def test_check_api_health_success(mocker, set_port_env_var):
 
     result = health_check.check_api_health()
     assert result is True
-    mock_get.assert_called_once_with('http://localhost:8000/health')
+    mock_get.assert_called_once_with('http://localhost:8000/dota2-gsi/health')
 
 
 # Test for a failed response
@@ -32,7 +32,7 @@ def test_check_api_health_failure(mocker, set_port_env_var):
 
     result = health_check.check_api_health()
     assert result is False
-    mock_get.assert_called_once_with('http://localhost:8000/health')
+    mock_get.assert_called_once_with('http://localhost:8000/dota2-gsi/health')
 
 
 # Test for a request exception
@@ -42,4 +42,4 @@ def test_check_api_health_request_exception(mocker, set_port_env_var):
 
     result = health_check.check_api_health()
     assert result is False
-    mock_get.assert_called_once_with('http://localhost:8000/health')
+    mock_get.assert_called_once_with('http://localhost:8000/dota2-gsi/health')

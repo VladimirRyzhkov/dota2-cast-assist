@@ -6,7 +6,7 @@ import requests
 
 def check_api_health() -> bool:
     api_port = os.getenv('PORT')
-    url = f"http://localhost:{api_port}/health"
+    url = f"http://localhost:{api_port}/dota2-gsi/health"
     try:
         response = requests.get(url)
         response.raise_for_status()
