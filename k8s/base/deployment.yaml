@@ -9,6 +9,11 @@ spec:
   selector:
     matchLabels:
       app: dota2-cast-assist-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   template:
     metadata:
       labels:
