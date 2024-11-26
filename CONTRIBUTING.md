@@ -38,5 +38,5 @@ at the moment:
 [Back to README.md](README.md)
 
 [discord]: https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white
-[discord-url]: https://discord.gg/9xCccyGF
+[discord-url]: https://discord.gg/ZhWZV6HN
 
