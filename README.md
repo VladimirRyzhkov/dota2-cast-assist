@@ -1,6 +1,8 @@
+<a id="readme-top"></a>
+
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
-
+ 
 
 <!-- PROJECT LOGO -->
 <br />
@@ -46,6 +48,8 @@ documentation references **Counter-Strike**, the same functionality applies to
 **Dota 2**: 
 
 [![CS][cs]][cs-url]
+
+<img src="images/how_it_works.png" alt="File Explorer">
 
 Once a special textual configuration file 
 is placed in the required folder on your system, the service begins 
@@ -114,9 +118,8 @@ Some folders may be _**hidden**_, so use these hotkeys to make them visible:
 > DO NOT CREATE THE FILE BY RIGHT-CLICKING IN FILE EXPLORER, 
 > as an additional extension `*.cfg.txt` will be added to the file, and the 
 > Dota 2 GSI server will not recognize it:
-> <a>
-    <img src="images/win_file_explorer_dont_create_using_right_click.png" alt="File Explorer">
-  </a>
+> <img src="images/win_file_explorer_dont_create_using_right_click.png" alt="File Explorer">
+
 
 > ℹ️  If you want to name the file differently, use this format for the name: 
    `gamestate_integration_<your_name_split-by-hyphens-or_underscores>.cfg`
