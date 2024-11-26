@@ -261,4 +261,4 @@ Project Link: [https://github.com/data-mission/dota2-cast-assist](https://github
 [cs-url]: https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive_Game_State_Integration
 
 [discord]: https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white
-[discord-url]: https://discord.gg/9xCccyGF
+[discord-url]: https://discord.gg/ZhWZV6HN
